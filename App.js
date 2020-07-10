@@ -1,94 +1,101 @@
-import React, { Component } from 'react';
+import React, {useState} from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { StyleSheet, Text, View, FlatList, TextInput, Button, TouchableOpacity} from 'react-native';
 import { Feather } from '@expo/vector-icons'; 
+import { Input, CheckBox, ListItem } from 'react-native-elements';
 
-class App extends Component {
-  state = {  
-    tasks : [
-      {id:1, message : "Drink a glass of water", check:"false"},
-      {id:2, message : "Be Amazing", check:"false"},
-      {id:3, message : "Do exercises", check:"false"},
-    ],
-    task : "",
+function App() {
+
+    const [tasks, setTasks] = useState([ 
+        {id:1, message : "Drink a glass of water", checked:false},
+        {id:2, message : "Be Amazing", checked:false},
+        {id:3, message : "Do exercises", checked:false},]);
+
+    const [task, setTask] = useState("");
+    
+  function changeTask(text) {
+    setTask(text);
   }
 
-  newTask = (text) => {
-    this.setState({
-      task : text
-    })
-  }
-
-  addTask = () => {
+  function addTask() {
     let newTask = {
       id: uuidv4(),
-      message : this.state.task,
-      check: "false"
+      message : task,
+      checked: false
     }
-    this.setState({
-      tasks : [...this.state.tasks,newTask]
-    })
-  }
-
-  completeTask = (id) => {
-    let task = this.state.tasks.filter(task => task.id === id);
-      if (task.check === "true"){
-        task.check = "false";
-      }
-      else {
-        task.check = "true"
-      }
+    console.log("toto");
+    setTasks([...tasks,newTask]);
   }
 
 
-  deleteTask = (id) => {
-    let tasks = this.state.tasks.filter(task => task.id !== id);
-    this.setState({
-      tasks: tasks,
-    })
+  // completeTask = (id) => {
+  //   let task = this.state.tasks.filter(task => task.id === id);
+  //     if (task.check === "true"){
+  //       task.check = "false";
+  //     }
+  //     else {
+  //       task.check = "true"
+  //     }
+  // }
+
+
+  function deleteTask(id) {
+    let tempTasks = tasks.filter(task => task.id !== id);
+    setTasks(tempTasks);
   }
 
+  function checkButton(id){
+    let tempTasks = tasks.filter(task => task.id === id);
+    tempTasks[0].checked = !tempTasks[0].checked;
+    console.log("toto");
+    let newTasks = tasks.filter(task => task.id !== id);
+    setTasks([...newTasks,tempTasks[0]]);
 
-
-  render() { 
+  }
 
     return ( 
       <View style={styles.container}>
         <View>
-          <TextInput style={styles.input} value={this.state.task} onChangeText={text => this.newTask(text)}/>
+          <Input style={styles.input} placeholder='add task...' value={task} onChangeText={text => changeTask(text)}/>
           <View style={styles.button}>
-            <Button title="Add task" onPress={this.addTask} />
+            <Button title="Add task" onPress={() => addTask()} />
             </View>
         </View>
 
         <FlatList
-        data = {this.state.tasks}
+        data = {tasks}
         renderItem = {({item}) => {
-        if(item.check === 'false'){
-          return (<View style={styles.containTask}>
-            <Text style={styles.task}>{item.message}</Text>
-            <TouchableOpacity onPress={id => this.completeTask(item.id)} >
+          <View style={styles.containTask}>
+              <ListItem
+                title={item.message}
+                // title={<CheckBox
+                //         title={item.message}
+                //         uncheckedIcon='circle-o'
+                //         checkedIcon='dot-circle-o'
+                //         checked={item.checked}
+                //         onPress={() => checkButton(item.id)}/>
+                //       }
+                bottomDivider
+              />            
+
+
+  
+                    {/* <CheckBox center title={item.message} checkedIcon='dot-circle-o' uncheckedIcon='circle-o' checked={item.checked} onPress={() => checkButton(item.id)}/> */}
+                {/* <Text style={styles.task}>{item.message}</Text>
+                <TouchableOpacity onPress={() => deleteTask(item.id)} >
               <Feather style={styles.delete} name="circle" size={24} color="black" />
-            </TouchableOpacity>
-            </View>)}
-        else{
-          return (<View style={styles.containTask}>
-            <Text style={styles.task}>{item.message}</Text>
-            <TouchableOpacity onPress={id => this.completeTask(item.id)} >
-              <Feather style={styles.delete} name="check-circle" size={24} color="black" />
-            </TouchableOpacity>
-            </View>)
-        }
-      }} 
-      keyExtractor = {item => item.id.toString()}
+            </TouchableOpacity> */}
+            </View>}} 
+        keyExtractor = {item => item.id.toString()}
       />
       </View>
      );
   }
-}
+
+
 
 //onPress={id => this.deleteTask(item.id)}
-
+// onPress={id => this.completeTask(item.id)
 
 const styles = StyleSheet.create({
   container: {
